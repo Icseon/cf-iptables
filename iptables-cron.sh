@@ -22,19 +22,19 @@ if ["$?" = "0" ]; then
     done
 
     # Store our results to a temporary file.
-    eval "cat <<< \$(</etc/sysconfig/iptables.template)\"" > $IP_TABLES_TEMP
+    eval "cat <<< \$(</etc/iptables.template)\"" > $IP_TABLES_TEMP
 
     # Find differences between the temporary file and the configuration we already have.
-    diff -q $IP_TABLES_TEMP /etc/sysconfig/iptables
+    diff -q $IP_TABLES_TEMP /etc/iptables
 
     # If we have a difference, replace the configuration with our temporary file and restart iptables
     if [ -s $IP_TABLES_TEMP -a "$?" = "1" ]; then
     
         # Replace our current configuration with our temporary file
-        mv -f $IP_TABLES_TEMP /etc/sysconfig/iptables
+        mv -f $IP_TABLES_TEMP /etc/iptables
 
         # Load new rules
-        iptables-restore /etc/sysconfig/iptables
+        iptables-restore /etc/iptables
 
     else
 
