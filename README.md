@@ -1,6 +1,6 @@
 ## Automated Cloudflare iptables Configuration
 
-**Status**: Untested. I'll update this status once I have tested this and confirmed it to be working.
+**Status**: Tested. Confirmed to be working as intended.
 
 **Disclaimer**:\
 I was inspired by: https://gist.github.com/AndrewJDR/47ea02e7d5b4665d705e
