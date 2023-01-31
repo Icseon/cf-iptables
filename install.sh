@@ -1,7 +1,8 @@
 #!/bin/bash
 # This file will install the cron-job that will automatically renew Cloudflare rules.
 
-# Step 1: Copy the template file to /etc
+# Step 1: Copy the template file to /etc and create a default iptables file
+touch /etc/iptables
 cp ./iptables.template /etc/iptables.template
 echo "1. Copied iptables.template to /etc/iptables.template"
 

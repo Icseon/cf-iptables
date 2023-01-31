@@ -1,3 +1,5 @@
+*filter
+
 # You may add your own rules here as desired
 
 # Allow Cloudflare to communicate with the web service ports.

@@ -8,21 +8,25 @@ IP_TABLES_TEMP=/tmp/iptables.new
 CLOUDFLARE_RULES=""
 
 # Download the Cloudflare IP addresses that we wish to allow.
-CLOUDFLARE_IP_ADDRESSES=$(curl --max-time 10 --silent -S -snL https://www.cloudflare.com/ips-v4 https://www.cloudflare.com/ips-v6)
+CLOUDFLARE_IP_ADDRESSES=$({
+    curl -s https://www.cloudflare.com/ips-v4
+    printf '\n\n'
+    curl -s https://www.cloudflare.com/ips-v6
+})
 
-if ["$?" = "0" ]; then
+if [ "$?" = "0" ]; then
 
     # Loop through every IP address that we have downloaded
     for line in $CLOUDFLARE_IP_ADDRESSES; do
 
         # Add the IP address to the CLOUDFLARE_RULES variable
-        CLOUDFLARE_RULES += "-A INPUT -s $line -p tcp -m multiport --dports 80,443 -j ACCEPT
-        "
+        CLOUDFLARE_RULES+="-A INPUT -s $line -p tcp -m multiport --dports 80,443 -j ACCEPT
+"
 
     done
 
     # Store our results to a temporary file.
-    eval "cat <<< \$(</etc/iptables.template)\"" > $IP_TABLES_TEMP
+    eval "cat <<< \"$(</etc/iptables.template)\"" > $IP_TABLES_TEMP
 
     # Find differences between the temporary file and the configuration we already have.
     diff -q $IP_TABLES_TEMP /etc/iptables
