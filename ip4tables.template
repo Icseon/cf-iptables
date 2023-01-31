@@ -3,7 +3,7 @@
 # You may add your own rules here as desired
 
 # Allow Cloudflare to communicate with the web service ports.
-$CLOUDFLARE_IP4_ADDRESSES
+$CLOUDFLARE_IP4_RULES
 
 # Drop all traffic that goes through to ports 80 and 443 by default.
 -A INPUT -p TCP -m multiport --dports 80,443 -j DROP
