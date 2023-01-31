@@ -1,50 +1,40 @@
 #!/bin/bash
 # This script will automatically generate Cloudflare iptable rules for us based on the IP addresses they expose for our use.
 
-# Temporary iptables configuration file location.
-IP_TABLES_TEMP=/tmp/iptables.new
-
 # Initialize an array which will hold the Cloudflare rules.
-CLOUDFLARE_RULES=""
+CLOUDFLARE_IP4_RULES=""
+CLOUDFLARE_IP6_RULES=""
 
 # Download the Cloudflare IP addresses that we wish to allow.
-CLOUDFLARE_IP_ADDRESSES=$({
-    curl -s https://www.cloudflare.com/ips-v4
-    printf '\n\n'
-    curl -s https://www.cloudflare.com/ips-v6
-})
+CLOUDFLARE_IP4_ADDRESSES=$(curl -s https://www.cloudflare.com/ips-v4)
+CLOUDFLARE_IP6_ADDRESSES=$(curl -s https://www.cloudflare.com/ips-v6)
 
 if [ "$?" = "0" ]; then
 
-    # Loop through every IP address that we have downloaded
-    for line in $CLOUDFLARE_IP_ADDRESSES; do
+    # Loop through every IPv4 address that we have downloaded
+    for line in $CLOUDFLARE_IP4_ADDRESSES; do
 
-        # Add the IP address to the CLOUDFLARE_RULES variable
-        CLOUDFLARE_RULES+="-A INPUT -s $line -p tcp -m multiport --dports 80,443 -j ACCEPT
+        # Add the IPv4 address to the CLOUDFLARE_IP4_ADDRESSES variable
+        CLOUDFLARE_IP4_RULES+="-A INPUT -s $line -p tcp -m multiport --dports 80,443 -j ACCEPT
 "
 
     done
 
-    # Store our results to a temporary file.
-    eval "cat <<< \"$(</etc/iptables.template)\"" > $IP_TABLES_TEMP
+        # Loop through every IPv6 address that we have downloaded
+    for line in $CLOUDFLARE_IP6_ADDRESSES; do
 
-    # Find differences between the temporary file and the configuration we already have.
-    diff -q $IP_TABLES_TEMP /etc/iptables
+        # Add the IPv6 address to the CLOUDFLARE_IP6_ADDRESSES variable
+        CLOUDFLARE_IP6_RULES+="-A INPUT -s $line -p tcp -m multiport --dports 80,443 -j ACCEPT
+"
 
-    # If we have a difference, replace the configuration with our temporary file and restart iptables
-    if [ -s $IP_TABLES_TEMP -a "$?" = "1" ]; then
-    
-        # Replace our current configuration with our temporary file
-        mv -f $IP_TABLES_TEMP /etc/iptables
+    done
 
-        # Load new rules
-        iptables-restore /etc/iptables
+    # Load IPv4s
+    eval "cat <<< \"$(</etc/ip4tables.template)\"" > /etc/ip4tables
+    iptables-restore /etc/ip4tables
 
-    else
-
-        # Delete the temporary file from our filesystem
-        rm -f $IP_TABLES_TEMP
-
-    fi
+    # Load IPv6s
+    eval "cat <<< \"$(</etc/ip6tables.template)\"" > /etc/ip6tables
+    ip6tables-restore /etc/ip6tables
 
 fi
