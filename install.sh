@@ -13,15 +13,19 @@ cp ./iptables-cron.sh /usr/local/sbin/
 chmod +x /usr/local/sbin/iptables-cron.sh
 echo "2. Copied iptables-cron.sh to /usr/local/sbin/ and made it executable"
 
-# Step 3: Install the crontab that will run once every hour.
+# Step 3: Run the script for the first time so that it's setup immediately.
+/usr/local/sbin/iptables-cron.sh
+echo "3. Ran cronjob script for the first time"
+
+# Step 4: Install the crontab that will run once every hour.
 # Get current crontab file and add our new crontab on top of it.
+# We're also going to restore the iptables on reboot.
 crontab -l > tempcron
+echo "@reboot iptables-restore /etc/ip4tables" >> tempcron
+echo "@reboot ip6tables-restore /etc/ip6tables" >> tempcron
 echo "0 * * * * /usr/local/sbin/iptables-cron.sh" >> tempcron
 
 # Install new cron file.
 crontab tempcron
 rm tempcron
-echo "3. Installed cronjob"
-
-# Finally, run the script for the first time so that it's setup immediately.
-/usr/local/sbin/iptables-cron.sh
+echo "4. Installed cronjob"
