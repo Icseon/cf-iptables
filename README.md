@@ -11,14 +11,14 @@ I do not hold any responsibility for any damages caused by improper usage of thi
 
 ### Usage
 1. Modify `iptables.template` to your liking. You can add your own custom rules such as allowing a specific IP address to access your services.
-2. Run `install.sh` as a root user. This will automatically set everything up and create the cronjob for you.
+2. Run `sudo bash install.sh`. This will automatically set everything up and create the cronjob for you.
 
 That's all. Your webserver should no longer respond to any request that does not orginate from Cloudflare, as if it doesn't even exist on the internet.
 
 ### Removal
 If you'd like to remove this from your system, follow these these three easy steps:
 1. Remove the crontab in root mode using `crontab -e`.
-2. Run: `rm /usr/local/sbin/iptables-cron.sh /etc/sysconfig/iptables.template`
+2. Run: `rm /usr/local/sbin/iptables-cron.sh /etc/iptables.template`
 3. Run: `iptables -F`
 
 ### Additional Recommendations
